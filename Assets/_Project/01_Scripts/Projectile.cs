@@ -3,11 +3,12 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [Header("Projectile Settings")]
-    [Tooltip("Movement speed of the projectile.")]
     [SerializeField] private float speed = 40f;
-
-    [Tooltip("Lifetime in seconds before auto-destroying.")]
     [SerializeField] private float lifeTime = 10f;
+    [SerializeField] private float damage = 10f;
+
+    [Tooltip("Tag to ignore. If this is player projectile, put 'Player'. If enemy projectile, put 'Enemy'.")]
+    [SerializeField] private string ignoreTag = "Player";
 
     [Tooltip("Material to force-apply on all renderers (fixes pink/magenta shaders).")]
     [SerializeField] private Material overrideMaterial;
@@ -16,7 +17,6 @@ public class Projectile : MonoBehaviour
 
     private void Awake()
     {
-        // Force replace any broken/pink material on this object and all its children
         if (overrideMaterial != null)
         {
             ApplyMaterialToAllRenderers(gameObject);
@@ -28,9 +28,6 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    /// <summary>
-    /// Sets initial world movement direction.
-    /// </summary>
     public void SetupDirection(Vector3 direction)
     {
         moveDirection = direction.normalized;
@@ -41,21 +38,33 @@ public class Projectile : MonoBehaviour
         transform.position += moveDirection * speed * Time.deltaTime;
     }
 
-    /// <summary>
-    /// Recursively overrides materials on MeshRenderers, TrailRenderers, and ParticleSystems.
-    /// </summary>
+    // --- SECCIÓN NUEVA: DAÑO Y COLISIÓN ---
+    private void OnTriggerEnter(Collider other)
+    {
+        // Don't hit ourselves
+        if (other.CompareTag(ignoreTag)) return;
+
+        // Try to get the EnemyBase component from the object we hit
+        if (other.TryGetComponent<EnemyBase>(out var enemy))
+        {
+            enemy.TakeDamage(damage);
+            Destroy(gameObject); // Destroy bullet after hitting enemy
+        }
+        else 
+        {
+            // Optional: destroy bullet if it hits an asteroid or wall
+            // Destroy(gameObject);
+        }
+    }
+
     private void ApplyMaterialToAllRenderers(GameObject target)
     {
         Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
-
         foreach (Renderer rend in renderers)
         {
             Material[] mats = new Material[rend.sharedMaterials.Length];
-            for (int i = 0; i < mats.Length; i++)
-            {
-                mats[i] = overrideMaterial;
-            }
+            for (int i = 0; i < mats.Length; i++) mats[i] = overrideMaterial;
             rend.materials = mats;
         }
     }
-}
+}   
