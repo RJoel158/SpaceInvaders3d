@@ -14685,6 +14685,7 @@ GameObject:
   - component: {fileID: 5353554063379017418}
   - component: {fileID: 2280245518941106885}
   - component: {fileID: 3481381063121612554}
+  - component: {fileID: -2446281429222889349}
   m_Layer: 6
   m_Name: AAA Projectiles Vol 2 - 22 star sky
   m_TagString: Untagged
@@ -14715,7 +14716,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8801045639904439529}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 13
   m_Type: 2
   m_Color: {r: 0.32549024, g: 0.4465854, b: 1, a: 1}
@@ -14829,3 +14830,17 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &-2446281429222889349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8801045639904439529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb3c04dfb38740746a0a47db1e34009b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  speed: 30
+  lifeTime: 10

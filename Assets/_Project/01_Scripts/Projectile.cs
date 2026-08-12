@@ -4,23 +4,23 @@ public class Projectile : MonoBehaviour
 {
     [Header("Projectile Settings")]
     [Tooltip("Movement speed of the projectile.")]
-    [SerializeField] private float speed = 30f;
+    [SerializeField] private float speed = 40f;
 
     [Tooltip("Lifetime in seconds before auto-destroying.")]
     [SerializeField] private float lifeTime = 10f;
 
-    private Vector3 moveDirection;
+    private Vector3 moveDirection = Vector3.forward;
 
     private void Start()
     {
-        // Auto-destroy after specified lifetime (10 seconds)
+        // Auto-destroy after 10 seconds
         Destroy(gameObject, lifeTime);
     }
 
     /// <summary>
-    /// Initializes direction vector for projectile movement.
+    /// Sets initial world movement direction.
     /// </summary>
-    /// <param name="direction">Normalized world direction.</param>
+    /// <param name="direction">Normalized direction vector.</param>
     public void SetupDirection(Vector3 direction)
     {
         moveDirection = direction.normalized;
@@ -28,13 +28,7 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        // Move linear towards initialized direction
+        // Move projectile linearly in target direction
         transform.position += moveDirection * speed * Time.deltaTime;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // Placeholder for collision logic with enemies
-        // We will handle enemy damage logic in future steps
     }
 }
