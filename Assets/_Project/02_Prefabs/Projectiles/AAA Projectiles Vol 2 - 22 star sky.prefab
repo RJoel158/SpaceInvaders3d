@@ -4970,6 +4970,7 @@ GameObject:
   - component: {fileID: 3481381063121612554}
   - component: {fileID: -2446281429222889349}
   - component: {fileID: 7860722772805545380}
+  - component: {fileID: -4357791072871865490}
   m_Layer: 6
   m_Name: AAA Projectiles Vol 2 - 22 star sky
   m_TagString: Untagged
@@ -5128,6 +5129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   speed: 30
   lifeTime: 10
+  damage: 10
+  ignoreTag: Player
   overrideMaterial: {fileID: 0}
 --- !u!23 &7860722772805545380
 MeshRenderer:
@@ -5178,3 +5181,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &-4357791072871865490
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8801045639904439529}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.30516154
+  m_Center: {x: 0, y: -0.011133641, z: 0}
