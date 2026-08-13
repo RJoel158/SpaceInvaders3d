@@ -11,30 +11,35 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] private GameObject explosionPrefab;
 
     protected float currentHealth;
+    protected bool isDead = false; // Bandera para evitar bucles de muerte
 
+    // virtual: permite que un hijo pueda modificar el Start si lo necesita
     protected virtual void Start()
     {
         currentHealth = maxHealth;
     }
 
+    // virtual: BossEnemy usa override Update para su máquina de estados
     protected virtual void Update()
     {
+        if (isDead) return;
+
         Move();
         CheckOffScreen();
     }
 
-    /// <summary>
-    /// Default movement: straight down the Y axis (or -Z depending on your camera setup).
-    /// Assumes top-down view where enemies move down the screen (negative Y or Z).
-    /// </summary>
+    // virtual: Kamikaze y Sniper usan override Move para cambiar cómo se mueven
     protected virtual void Move()
     {
-        // Change Vector3.back to Vector3.down if your game is vertically oriented on Y instead of Z
+        // Se mueve hacia atrás en el eje Z (hacia el jugador)
         transform.position += Vector3.back * moveSpeed * Time.deltaTime;
     }
 
+    // virtual: BossEnemy usa override TakeDamage para evitar daño cuando ya está muriendo
     public virtual void TakeDamage(float damageAmount)
     {
+        if (isDead) return;
+
         currentHealth -= damageAmount;
         
         if (currentHealth <= 0)
@@ -43,23 +48,36 @@ public class EnemyBase : MonoBehaviour
         }
     }
 
+    // virtual: BossEnemy usa override Die para hacer cosas extras antes de destruirse
     protected virtual void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
+        // --- NUEVO: Avisar al Spawner para que cuente la baja y ver si sale el Boss ---
+        EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
+        if (spawner != null)
+        {
+            spawner.RegisterKill();
+        }
+        // --------------------------------------------------------------------------
+
+        // Si asignaste un efecto de explosión, lo crea antes de morir
         if (explosionPrefab != null)
         {
             Instantiate(explosionPrefab, transform.position, Quaternion.identity);
         }
         
-        // Add score logic here if needed
+        // Destruye el objeto del enemigo
         Destroy(gameObject);
     }
 
     /// <summary>
-    /// Destroys the enemy if it goes too far past the player to save memory.
+    /// Destruye al enemigo si pasa de largo al jugador para no consumir memoria infinita.
     /// </summary>
     private void CheckOffScreen()
     {
-        // Adjust this threshold based on your game's coordinates
+        // Ajusta este -20f dependiendo de dónde esté tu cámara
         if (transform.position.z < -20f || transform.position.y < -20f)
         {
             Destroy(gameObject);

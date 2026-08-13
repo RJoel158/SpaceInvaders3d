@@ -2,45 +2,80 @@ using UnityEngine;
 
 public class SniperEnemy : EnemyBase
 {
-    [Header("Sniper Settings")]
-    [SerializeField] private float stopDistance = 20f;
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform firePoint;
-    [SerializeField] private float fireRate = 1.5f;
+    [Header("Movimiento Sniper")]
+    private Transform player;
+    public float stoppingDistance = 15f; // Distancia a la que se detiene para disparar
 
-    private float nextFireTime;
-    private bool isStopped = false;
+    [Header("Combate")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;          // Desde dónde sale la bala
+    public float fireRate = 1.5f;        // Balas por segundo
+    private float nextFireTime = 0f;     // Temporizador de disparo
 
-    protected override void Move()
+    protected override void Start()
     {
-        // Stop moving once it reaches a certain Z (or Y) threshold
-        if (!isStopped && transform.position.z <= stopDistance)
+        base.Start(); // Inicializa la vida de EnemyBase
+
+        // Busca al jugador automáticamente si no lo arrastraste en el Inspector
+        if (player == null)
         {
-            isStopped = true;
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null) player = playerObj.transform;
+        }
+    }
+
+    protected override void Update()
+    {
+        // Si está muerto o no hay jugador, no hace nada
+        if (isDead || player == null) return;
+
+        HandleMovementAndAim();
+        HandleShooting();
+    }
+
+    void HandleMovementAndAim()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // Mirar siempre al jugador
+        Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0; // Evita que el enemigo se incline hacia el suelo o cielo
+        
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         }
 
-        if (!isStopped)
+        // Moverse hacia el jugador SOLO si está más lejos que su distancia de frenado
+        if (distanceToPlayer > stoppingDistance)
         {
-            base.Move(); // Move normally until stopped
+            transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+        }
+    }
+
+    void HandleShooting()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // Si el jugador está dentro del rango de visión y el temporizador lo permite
+        if (distanceToPlayer <= stoppingDistance + 2f && Time.time >= nextFireTime)
+        {
+            Shoot();
+            nextFireTime = Time.time + (1f / fireRate); // Reinicia el temporizador
+        }
+    }
+
+    void Shoot()
+    {
+        if (bulletPrefab != null && firePoint != null)
+        {
+            // Crea la bala en la posición y rotación del FirePoint
+            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         }
         else
         {
-            Shoot(); // Start shooting when stopped
+            Debug.LogError("¡Falta asignar la Bala o el FirePoint en el Inspector del Sniper!");
         }
     }
-
-    private void Shoot()
-    {
-        if (Time.time >= nextFireTime && projectilePrefab != null)
-        {
-            nextFireTime = Time.time + fireRate;
-            
-            // Shoots directly backwards (towards the player)
-            GameObject proj = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(Vector3.back));
-            if (proj.TryGetComponent<Projectile>(out var projectile))
-            {
-                projectile.SetupDirection(Vector3.back);
-            }
-        }
-    }
-}   
+}

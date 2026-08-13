@@ -3,9 +3,9 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [Header("Projectile Settings")]
-    [SerializeField] private float speed = 40f;
-    [SerializeField] private float lifeTime = 10f;
-    [SerializeField] private float damage = 10f;
+    [SerializeField] private float speed = 60f; // Aumentado para mayor precisión a distancia
+    [SerializeField] private float lifeTime = 5f;
+    [SerializeField] private float damage = 25f;
 
     [Tooltip("Tag to ignore. If this is player projectile, put 'Player'. If enemy projectile, put 'Enemy'.")]
     [SerializeField] private string ignoreTag = "Player";
@@ -13,7 +13,7 @@ public class Projectile : MonoBehaviour
     [Tooltip("Material to force-apply on all renderers (fixes pink/magenta shaders).")]
     [SerializeField] private Material overrideMaterial;
 
-    private Vector3 moveDirection = Vector3.forward;
+    private Vector3 moveDirection = Vector3.zero;
 
     private void Awake()
     {
@@ -26,6 +26,11 @@ public class Projectile : MonoBehaviour
     private void Start()
     {
         Destroy(gameObject, lifeTime);
+
+        if (moveDirection == Vector3.zero)
+        {
+            moveDirection = transform.forward;
+        }
     }
 
     public void SetupDirection(Vector3 direction)
@@ -35,26 +40,34 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
+        // Movimiento ultra preciso por frame
         transform.position += moveDirection * speed * Time.deltaTime;
     }
 
-    // --- SECCIÓN NUEVA: DAÑO Y COLISIÓN ---
     private void OnTriggerEnter(Collider other)
     {
-        // Don't hit ourselves
         if (other.CompareTag(ignoreTag)) return;
 
-        // Try to get the EnemyBase component from the object we hit
+        // 1. Dañar a cualquier enemigo que herede de EnemyBase (Kamikaze, Sniper, Boss)
         if (other.TryGetComponent<EnemyBase>(out var enemy))
         {
             enemy.TakeDamage(damage);
-            Destroy(gameObject); // Destroy bullet after hitting enemy
+            Destroy(gameObject); 
+            return;
         }
-        else 
+        
+        // 2. Dañar al jugador (si la bala es enemiga)
+        if (other.CompareTag("Player"))
         {
-            // Optional: destroy bullet if it hits an asteroid or wall
-            // Destroy(gameObject);
+            // Descomenta la línea de abajo si ya tienes tu script de vida del jugador configurado:
+            // if (other.TryGetComponent<PlayerHealth>(out var player)) { player.TakeDamage(damage); }
+            
+            Destroy(gameObject);
+            return;
         }
+
+        // Destruir la bala si choca con el entorno (paredes, suelo, etc.)
+        Destroy(gameObject);
     }
 
     private void ApplyMaterialToAllRenderers(GameObject target)
@@ -67,4 +80,4 @@ public class Projectile : MonoBehaviour
             rend.materials = mats;
         }
     }
-}   
+}
