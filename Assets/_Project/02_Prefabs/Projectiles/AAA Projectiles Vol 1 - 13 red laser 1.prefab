@@ -5003,7 +5003,7 @@ GameObject:
   - component: {fileID: 367842778363953312}
   m_Layer: 6
   m_Name: AAA Projectiles Vol 1 - 13 red laser 1
-  m_TagString: Bullet
+  m_TagString: EnemyProjectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
