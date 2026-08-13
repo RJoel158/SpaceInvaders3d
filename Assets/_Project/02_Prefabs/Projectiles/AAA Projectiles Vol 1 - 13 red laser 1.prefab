@@ -5067,7 +5067,7 @@ MonoBehaviour:
   lifeTime: 10
   damage: 10
   ignoreTag: Enemy
-  overrideMaterial: {fileID: 2100000, guid: abdda39d66abb26429b4e9fd0d6293c9, type: 2}
+  overrideMaterial: {fileID: 2100000, guid: de902e79c344c8e48ae3e828c3f5717f, type: 2}
 --- !u!23 &2272662518287177215
 MeshRenderer:
   m_ObjectHideFlags: 0

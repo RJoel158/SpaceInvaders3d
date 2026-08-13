@@ -18,9 +18,6 @@ public class Ship_Shooting : MonoBehaviour
     [Tooltip("Cooldown delay between consecutive shots in seconds.")]
     [SerializeField] private float fireRate = 0.15f;
 
-    [Tooltip("Distance along Z axis in front of the ship where crosshair targets.")]
-    [SerializeField] private float targetDepthDistance = 35f;
-
     private Camera mainCamera;
     private float nextFireTime = 0f;
 
@@ -64,6 +61,7 @@ public class Ship_Shooting : MonoBehaviour
             isFiring = Mouse.current.leftButton.isPressed;
         }
 
+        // Solo dispara si hace clic Y el temporizador de cadencia lo permite
         if (isFiring && Time.time >= nextFireTime)
         {
             Shoot();
@@ -72,43 +70,49 @@ public class Ship_Shooting : MonoBehaviour
 
     private void Shoot()
     {
-        nextFireTime = Time.time + fireRate;
+        nextFireTime = Time.time + fireRate; // Restaura el enfriamiento para que no sea constante
 
-        if (projectilePrefab == null || firePoint == null) return;
+        if (projectilePrefab == null || firePoint == null)
+        {
+            Debug.LogError("¡Falta asignar el projectilePrefab o el firePoint!");
+            return;
+        }
 
-        // 1. Get current mouse/pointer position
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null) return;
+        }
+
+        // 1. Obtener posición del ratón en pantalla
         Vector2 mouseScreenPos = Vector2.zero;
         if (Pointer.current != null)
         {
             mouseScreenPos = Pointer.current.position.ReadValue();
         }
 
-        // 2. Cast a ray from Main Camera towards the mouse position
+        // 2. Lanzar un rayo desde la cámara hacia el ratón
         Ray ray = mainCamera.ScreenPointToRay(mouseScreenPos);
 
-        // 3. Define an aim plane situated in front of the ship in world Z space
-        Plane targetPlane = new Plane(Vector3.back, firePoint.position + Vector3.forward * targetDepthDistance);
+        // 3. Crear un plano horizontal a la altura de la nave (Eje Y de la nave)
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0, firePoint.position.y, 0));
 
-        Vector3 targetWorldPoint;
-
-        if (targetPlane.Raycast(ray, out float enterDistance))
+        // 4. Calcular el punto exacto donde el rayo del mouse cruza el plano del mundo
+        if (groundPlane.Raycast(ray, out float enterDistance))
         {
-            targetWorldPoint = ray.GetPoint(enterDistance);
-        }
-        else
-        {
-            targetWorldPoint = firePoint.position + Vector3.forward * targetDepthDistance;
-        }
+            Vector3 worldTarget = ray.GetPoint(enterDistance);
+            
+            // Dirección exacta hacia el cursor en el suelo del juego
+            Vector3 shootDirection = (worldTarget - firePoint.position).normalized;
+            shootDirection.y = 0; // Mantener los disparos nivelados en el plano de la nave
 
-        // 4. Calculate direction vector towards the target plane intersection point
-        Vector3 shootDirection = (targetWorldPoint - firePoint.position).normalized;
+            // 5. Instanciar la bala con la rotación correcta
+            GameObject projInstance = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(shootDirection));
 
-        // 5. Instantiate projectile
-        GameObject projInstance = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(shootDirection));
-
-        if (projInstance.TryGetComponent<Projectile>(out var projectile))
-        {
-            projectile.SetupDirection(shootDirection);
+            if (projInstance.TryGetComponent<Projectile>(out var projectile))
+            {
+                projectile.SetupDirection(shootDirection);
+            }
         }
     }
 

@@ -5131,7 +5131,7 @@ MonoBehaviour:
   lifeTime: 10
   damage: 10
   ignoreTag: Player
-  overrideMaterial: {fileID: 0}
+  overrideMaterial: {fileID: 2100000, guid: abdda39d66abb26429b4e9fd0d6293c9, type: 2}
 --- !u!135 &-4357791072871865490
 SphereCollider:
   m_ObjectHideFlags: 0
