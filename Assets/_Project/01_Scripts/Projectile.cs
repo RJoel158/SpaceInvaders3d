@@ -66,6 +66,28 @@ public class Projectile : MonoBehaviour
             return;
         }
 
+        if (other.TryGetComponent<Fracture>(out var fractureObject))
+        {
+            fractureObject.FractureObject();
+            Destroy(gameObject); // Destruye la bala
+            return;
+        }
+        // Si choca con cualquier cosa que herede de EnemyBase (incluyendo el Boss)
+        if (other.TryGetComponent<EnemyBase>(out var baseEnemy))
+        {
+            baseEnemy.TakeDamage(damage);
+            Destroy(gameObject);
+            return;
+        }
+        
+
+        if (CompareTag("EnemyProjectile")) // Asegúrate de que tu bala enemiga tenga el Tag o un booleano que la identifique
+        {
+            if (other.CompareTag("Enemy") || other.TryGetComponent<Fracture>(out _))
+            {
+                return; // Ignora la colisión por completo
+            }
+        }
         // Destruir la bala si choca con el entorno (paredes, suelo, etc.)
         Destroy(gameObject);
     }

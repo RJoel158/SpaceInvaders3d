@@ -1,20 +1,24 @@
 using UnityEngine;
-using UnityEngine.UI; // Necesario para trabajar con la barra de vida de UI
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Configuración de Vida")]
     [SerializeField] private float maxHealth = 50f;
     private float currentHealth;
+    private bool isDead = false;
 
     [Header("UI Reference")]
-    [SerializeField] private Slider healthSlider; // Arrastra aquí tu Slider de la UI
+    [SerializeField] private Slider healthSlider;
+
+    [Header("Efectos de Muerte")]
+    [SerializeField] private GameObject deathEffectPrefab; // Arrastra aquí tu prefab de explosión
 
     void Start()
     {
         currentHealth = maxHealth;
 
-        // Configurar la barra de vida al iniciar
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
@@ -22,19 +26,17 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // Método para recibir daño (llamado por los proyectiles enemigos o kamikazes)
     public void TakeDamage(float amount)
     {
+        if (isDead) return;
+
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        // Actualizar la barra visualmente
         if (healthSlider != null)
         {
             healthSlider.value = currentHealth;
         }
-
-        Debug.Log("Vida actual del jugador: " + currentHealth);
 
         if (currentHealth <= 0)
         {
@@ -42,30 +44,47 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // Detección de colisión por choque directo con el Kamikaze
     private void OnTriggerEnter(Collider other)
     {
-        // Si choca con un enemigo (asegúrate de que el kamikaze tenga su tag o lo detecte)
+        if (isDead) return;
+
+        // Si choca con un Kamikaze
         if (other.TryGetComponent<KamikazeEnemy>(out var kamikaze))
         {
-            TakeDamage(1f); // Pierde 1 de vida por choque
+            TakeDamage(1f);
         }
         
-        // Si un proyectil enemigo te da (asumiendo que las balas enemigas tienen un tag o lógica propia)
+        // Si choca con un asteroide (asumiendo que los asteroides tienen el script Fracture o un tag de Asteroide)
+        if (other.TryGetComponent<Fracture>(out var asteroid))
+        {
+            TakeDamage(5f); // Pierde 5 de vida por choque con asteroide
+            asteroid.FractureObject(); // Opcional: rompe el asteroide al chocar con el player
+        }
+        
         if (other.CompareTag("EnemyProjectile"))
         {
-            TakeDamage(1f); // Pierde 1 de vida por proyectil
-            Destroy(other.gameObject); // Destruye la bala enemiga al impactar
+            TakeDamage(1f);
+            Destroy(other.gameObject);
         }
     }
 
     void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
         Debug.Log("¡El jugador ha muerto!");
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-        // Aquí puedes reiniciar la escena o mostrar pantalla de Game Over
-        // Ejemplo: UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-        
+
+        // 1. Instancia la explosión en la posición de la nave
+        if (deathEffectPrefab != null)
+        {
+            Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        // 2. Reinicia la escena actual
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        // 3. Destruye el objeto de la nave
         Destroy(gameObject);
     }
 }

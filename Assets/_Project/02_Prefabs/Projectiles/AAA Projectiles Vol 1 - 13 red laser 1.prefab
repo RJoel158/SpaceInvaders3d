@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3438178059085294828}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 7063354482826600289}
   - component: {fileID: 2961831131191191586}
   - component: {fileID: 1519134151168356969}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5001,7 +5001,7 @@ GameObject:
   - component: {fileID: -6707093557207867282}
   - component: {fileID: 2272662518287177215}
   - component: {fileID: 367842778363953312}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: AAA Projectiles Vol 1 - 13 red laser 1
   m_TagString: EnemyProjectile
   m_Icon: {fileID: 0}

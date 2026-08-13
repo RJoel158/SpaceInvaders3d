@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9169990260883780479}
@@ -136,7 +136,7 @@ MonoBehaviour:
   maxHealth: 50
   moveSpeed: 10
   explosionPrefab: {fileID: 5481530993414605263, guid: 7a12b40fb78f3694ea3ba5830db032b4, type: 3}
-  stoppingDistance: 30
+  stoppingDistance: 50
   bulletPrefab: {fileID: 6302011233527292576, guid: 699da8576290b7040ac6a7baf6aac5f3, type: 3}
   firePoint: {fileID: 9169990260883780479}
   fireRate: 1.5

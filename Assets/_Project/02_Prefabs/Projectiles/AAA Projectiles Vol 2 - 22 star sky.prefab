@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2118626303960114246}
   - component: {fileID: 8074398094726634080}
   - component: {fileID: 2950975414064827533}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4933,7 +4933,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4319667256244522779}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4971,7 +4971,7 @@ GameObject:
   - component: {fileID: -2446281429222889349}
   - component: {fileID: -4357791072871865490}
   - component: {fileID: 8642959016210257478}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: AAA Projectiles Vol 2 - 22 star sky
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5127,8 +5127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb3c04dfb38740746a0a47db1e34009b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  speed: 30
-  lifeTime: 10
+  speed: 40
+  lifeTime: 12
   damage: 10
   ignoreTag: Player
   overrideMaterial: {fileID: 2100000, guid: abdda39d66abb26429b4e9fd0d6293c9, type: 2}
